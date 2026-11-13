@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Тесты Ages of Dominion</title>
+  <style>
+    :root { --bg: #f3e3c3; --fg: #2b1d14; --cell: #fffaf0; --head: #e9d5ab; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #1a130e; --fg: #ecdfc2; --cell: #241b14; --head: #3a2c20; } }
+    :root[data-theme="dark"] { --bg: #1a130e; --fg: #ecdfc2; --cell: #241b14; --head: #3a2c20; }
+    body { font-family: 'PT Serif', Georgia, serif; background: var(--bg); color: var(--fg); margin: 0; padding: 16px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 18px; background: var(--cell); }
+    th, td { border: 1px solid #8a6d3b66; padding: 5px 8px; text-align: left; font-size: 14px; vertical-align: top; }
+    th { background: var(--head); }
+    .pass { color: #3c9a3c; font-weight: bold; } .fail { color: #d0382a; font-weight: bold; }
+    .summary { font-size: 20px; margin: 10px 0 18px; }
+  </style>
+</head>
+<body>
+  <h1>Автотесты Ages of Dominion</h1>
+  <p>Симуляция партий занимает несколько секунд.</p>
+  <div class="summary" id="summary">Выполняется…</div>
+  <div id="out"></div>
+  <script src="../js/data.js"></script><script src="../js/nlp.js"></script><script src="../js/ai.js"></script><script src="../js/engine.js"></script>
+  <script src="../js/storage.js"></script><script src="../js/shop.js"></script><script src="suite.js"></script>
+  <script>
+    setTimeout(() => {
+      const KEY = 'agesofdominion_v1';
+      let backup = null; try { backup = localStorage.getItem(KEY); } catch (e) {}
+      const res = RFTests.runAll(RF, { simulate: true, games: 2, levels: [1, 2] });
+      try { if (backup) localStorage.setItem(KEY, backup); else localStorage.removeItem(KEY); } catch (e) {}
+      const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+      let html = '';
+      for (const s of res.sections) html += `<h2>${s.name}</h2><table><tr><th>ID</th><th>Проверка</th><th>Итог</th><th>Фактически</th></tr>${s.results.map((r) => `<tr><td>${r.id}</td><td>${esc(r.name)}</td><td class="${r.pass ? 'pass' : 'fail'}">${r.pass ? 'Pass' : 'Fail'}</td><td>${esc(r.detail)}</td></tr>`).join('')}</table>`;
+      html += `<h2>NLP: отложенная выборка (${res.nlp.size} фраз)</h2><table><tr><th>Фраза</th><th>Ожидалось</th><th>Получено</th><th>Уверенность</th><th>Сущности</th></tr>${res.nlp.rows.map((r) => `<tr><td>${esc(r.text)}</td><td>${r.expected}</td><td class="${r.ok ? 'pass' : 'fail'}">${r.got}</td><td>${Math.round(r.conf * 100)}%</td><td>${esc(r.gotEnt)}</td></tr>`).join('')}</table>`;
+      if (res.sim.length) html += `<h2>Симуляция</h2><table><tr><th>Сценарий</th><th>Стиль</th><th>Побед</th><th>Войн против игрока</th><th>Коалиций</th><th>Захватов</th><th>Смен правителей</th></tr>${res.sim.map((r) => `<tr><td>${r.level}</td><td>${r.style}</td><td>${Math.round(r.winRate * 100)}%</td><td>${r.warsOnPlayer.toFixed(2)}</td><td>${r.coalitions}</td><td>${r.captures.toFixed(1)}</td><td>${r.successions.toFixed(1)}</td></tr>`).join('')}</table>`;
+      document.getElementById('out').innerHTML = html;
+      document.getElementById('summary').innerHTML = `Пройдено <b>${res.passed}</b> из <b>${res.total}</b> · точность NLP <b>${(res.nlp.accuracy * 100).toFixed(1)}%</b>`;
+    }, 50);
+  </script>
+</body>
+</html>

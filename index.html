@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ages of Dominion</title>
+  <meta name="description" content="Глобальная стратегия: живая карта мира, города, армии, герои, войны, технологии, династии. ИИ управляет соседними державами, приказы — голосом.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 18 L2 7 L7 11 L12 4 L17 11 L22 7 L21 18 Z' fill='%23f2c94c' stroke='%232b1d14' stroke-width='1.6'/%3E%3C/svg%3E">
+</head>
+<body>
+<canvas id="menu-bg" class="menu-bg"></canvas>
+<div id="app">
+  <!-- СТАРТ -->
+  <section id="scr-start" class="screen active">
+    <div class="start-inner">
+      <div id="start-logo"></div>
+      <h1 class="title">AGES OF DOMINION</h1>
+      <p class="tagline">Построй державу, что переживёт века. Веди героев. Выигрывай войны.</p>
+      <button class="btn btn-primary btn-xl pulse" id="btn-start">Начать</button>
+      <p class="hint">Chrome или Edge · микрофон для голосовых приказов</p>
+    </div>
+  </section>
+
+  <!-- МЕНЮ -->
+  <section id="scr-menu" class="screen">
+    <div class="menu2">
+      <header class="menu2-title">
+        <div id="menu-logo"></div>
+        <h1 class="title">AGES OF DOMINION</h1>
+        <p class="tagline">Эпоха королей, героев и войн</p>
+      </header>
+      <nav class="menu2-nav">
+        <label class="name-field">Имя правителя
+          <input id="player-name" maxlength="20" autocomplete="off">
+        </label>
+        <button class="mbtn primary" id="btn-continue">Продолжить партию</button>
+        <button class="mbtn primary" id="btn-new">Новая игра</button>
+        <button class="mbtn" id="btn-shop"></button>
+        <button class="mbtn" id="btn-records"></button>
+        <button class="mbtn" id="btn-help"></button>
+        <button class="mbtn" id="btn-settings"></button>
+        <div class="seals-line" id="menu-seals"></div>
+      </nav>
+      <aside class="menu2-heroes">
+        <h3>Герои эпохи</h3>
+        <div class="hero-cards" id="menu-heroes"></div>
+        <p class="menu2-note">На фоне — живой мир: державы под управлением ИИ строят города, водят армии и воюют прямо сейчас.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ИГРА -->
+  <section id="scr-game" class="screen">
+    <header class="topbar">
+      <div class="tb-left">
+        <span class="tb-logo" id="tb-logo"></span>
+        <div class="res-row" id="res-row"></div>
+      </div>
+      <div class="tb-right">
+        <div class="turn-info" id="turn-info"></div>
+        <button class="btn btn-icon" id="btn-tech" title="Технологии (T)"></button>
+        <button class="btn btn-icon" id="btn-civics" title="Институты и политики (P)"></button>
+        <button class="btn btn-icon" id="btn-diplo" title="Дипломатия (G)"></button>
+        <button class="btn btn-icon" id="btn-dynasty" title="Династия (R)"></button>
+        <button class="btn btn-icon" id="btn-ai" title="ИИ-аналитика"></button>
+        <button class="btn btn-icon" id="btn-gshop" title="Королевская лавка"></button>
+        <button class="btn btn-icon" id="btn-pause" title="Меню (Esc)"></button>
+      </div>
+    </header>
+    <div class="map-area">
+      <canvas id="map"></canvas>
+      <div class="hud-left">
+        <div class="ruler-card panel" id="ruler-card"></div>
+        <div class="hero-card panel hidden" id="hero-card" title="Герой державы (H)"></div>
+        <div class="feed" id="feed"></div>
+      </div>
+      <div class="hud-top"><div class="hud-research panel" id="research-box"></div><div class="hud-research panel" id="civic-box"></div></div>
+      <div class="unit-bar hidden" id="unit-bar"></div>
+      <div class="minimap panel"><canvas id="minimap" width="220" height="140"></canvas></div>
+      <div class="sel-panel panel hidden" id="sel-panel"></div>
+      <div class="city-panel panel hidden" id="city-panel"></div>
+      <div class="voice-panel panel">
+        <div class="voice-row">
+          <button class="mic" id="btn-mic" title="Голосовой приказ (M)"></button>
+          <div class="voice-info">
+            <div class="voice-status" id="voice-status">Микрофон (M) — голосовой приказ</div>
+            <div class="voice-transcript" id="voice-transcript"></div>
+            <div class="voice-parse" id="voice-parse"></div>
+          </div>
+        </div>
+        <form class="cmd-form" id="cmd-form">
+          <input id="cmd-input" placeholder="…или текстом: «основать город»" autocomplete="off">
+          <button class="btn btn-small" type="submit">↵</button>
+          <label class="check" title="Микрофон остаётся включённым"><input type="checkbox" id="chk-continuous"> непрерывно</label>
+        </form>
+      </div>
+      <div class="end-box">
+        <div class="end-hint" id="end-hint"></div>
+        <button class="btn btn-primary btn-end" id="btn-end">Следующий ход</button>
+      </div>
+      <div class="tile-tip hidden" id="tile-tip"></div>
+      <div class="war-banner" id="war-banner"></div>
+    </div>
+  </section>
+
+  <section id="scr-result" class="screen"></section>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-box panel" id="modal-box"></div></div>
+  <div id="toast" class="toast"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/nlp.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/art.js"></script>
+<script src="js/render.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/ui.js"></script>
+<script>window.addEventListener('DOMContentLoaded', () => RF.UI.init());</script>
+</body>
+</html>
